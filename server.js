@@ -25,8 +25,6 @@ var server = http.createServer(function (request, response) {
     if (path === "/register" && method === 'POST') {
         response.setHeader('Content-Type', 'text/html;charset=utf-8')
         const userArray = JSON.parse(fs.readFileSync('./db/users.json'))
-        console.log(userArray)
-        console.log(userArray.length)
         const array = []
         request.on('data', (chunk) => {
             array.push(chunk)
@@ -47,6 +45,27 @@ var server = http.createServer(function (request, response) {
             response.end()
         })
 
+    } else if (path === "/sign_in" && method === 'POST') {
+        response.setHeader('Content-Type', 'text/html;charset=utf-8')
+        const userArray = JSON.parse(fs.readFileSync('./db/users.json'))
+        const array = []
+        request.on('data', (chunk) => {
+            array.push(chunk)
+        })
+        request.on('end', () => {
+            const string = Buffer.concat(array).toString()
+            console.log(string)
+            const obj = JSON.parse(string)
+            const user = userArray.find((user) => user.name === obj.name && user.password === obj.password)
+            if (user === undefined) {
+                response.statusCode = 400
+                response.setHeader('Content-Type', 'text/json;charset=utf-8')
+                response.end(`{"errorCode":531}`)
+            } else {
+                response.Code = 200
+                response.end()
+            }
+        })
     } else {
         response.statusCode = 200
         //默认首页
